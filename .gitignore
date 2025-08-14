@@ -1,0 +1,22 @@
+# General
+node_modules/
+dist/
+build/
+.DS_Store
+.env
+.venv/
+*.pyc
+__pycache__/
+.cache/
+
+# Python
+.pytest_cache/
+.mypy_cache/
+
+# Frontend
+*.log
+
+# OS
+Thumbs.db
+
+
