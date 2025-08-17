@@ -18,5 +18,10 @@ __pycache__/
 
 # OS
 Thumbs.db
+# Ignore virtual environment
+venv/
+.venv/
+backend/venv/
+
 
 
