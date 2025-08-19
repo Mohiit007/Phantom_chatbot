@@ -36,6 +36,8 @@
 from backend.utils.finance import years_until, future_value, monthly_saving_needed
 from backend.settings import settings
 from backend.services.inflation import fetch_worldbank_inflation  # 👈 
+from typing import Optional
+
 
 def _get_inflation_percent() -> float:
     """Fetch real inflation if possible, else fallback."""
@@ -48,8 +50,17 @@ def _get_inflation_percent() -> float:
         pass
     return float(settings.fallback_inflation)
 
-def plan_event(event_name: str, today_cost: float, target_year: int) -> dict:
-    inflation_pct = _get_inflation_percent()
+
+def _recommendation_for_horizon(years_to_goal: int) -> str:
+    if years_to_goal < 1:
+        return "Fixed deposit or ultra-short-term debt instruments"
+    if years_to_goal <= 3:
+        return "Short-duration debt or conservative mutual funds"
+    return "Equity-oriented mutual funds (SIP preferred)"
+
+
+def plan_event(event_name: str, today_cost: float, target_year: int, inflation_override_pct: Optional[float] = None) -> dict:
+    inflation_pct = inflation_override_pct if (inflation_override_pct is not None and inflation_override_pct >= 0) else _get_inflation_percent()
     yrs = years_until(target_year)
     fut = future_value(today_cost, inflation_pct, yrs)
     monthly = monthly_saving_needed(fut, yrs * 12)
@@ -62,4 +73,5 @@ def plan_event(event_name: str, today_cost: float, target_year: int) -> dict:
         "years_to_goal": yrs,
         "future_cost": fut,
         "monthly_saving_needed": monthly,
+        "recommendation": _recommendation_for_horizon(yrs),
     }
