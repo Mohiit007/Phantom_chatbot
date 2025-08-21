@@ -1,5 +1,4 @@
-from pydantic_settings import BaseSettings  # instead of from pydantic import BaseSettings
-
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # World Bank
@@ -21,6 +20,9 @@ class Settings(BaseSettings):
     
     # Mock toggle
     use_mock_market: bool = True
+
+    # Mock toggle
+    use_mock_market: bool = False   
 
     class Config:
         env_file = ".env"

@@ -122,7 +122,6 @@ class ChatMessageRequest(BaseModel):
 
 class ChatMessageResponse(BaseModel):
     reply: str
-    # Optional structured artifacts the UI could use
     plan: Optional[PlanResponse] = None
     market_summary: Optional[dict] = None
 
@@ -131,7 +130,7 @@ class ChatMessageResponse(BaseModel):
 # Expense / Income schemas
 # -------------------------
 class ExpenseIn(BaseModel):
-    date: Optional[str] = None  # ISO date string, defaults to today if None
+    date: Optional[str] = None
     amount: float
     category: str
     note: Optional[str] = None
@@ -141,7 +140,7 @@ class ExpenseIn(BaseModel):
         @classmethod
         def _validate_amount(cls, v: float):
             if v <= 0:
-                raise ValueError("amount must be > 0")
+                raise ValueError("Amount must be > 0")
             return v
 
 
@@ -160,7 +159,7 @@ class IncomeIn(BaseModel):
         @classmethod
         def _validate_amount(cls, v: float):
             if v <= 0:
-                raise ValueError("amount must be > 0")
+                raise ValueError("Amount must be > 0")
             return v
 
 

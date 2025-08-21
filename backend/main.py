@@ -4,9 +4,7 @@ from datetime import datetime
 from backend.logging_config import logger
 from backend import models
 from backend.database import engine
-from backend.routers import goals, planner , market  # <-- Import routers
-from backend.routers import nlp
-from backend.routers import agent
+from backend.routers import goals, planner, market, nlp, agent
 from backend.schemas import ExpenseIn, Expense, IncomeIn, Income, AdviceResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -141,4 +139,4 @@ def get_advice() -> AdviceResponse:
         tax_bracket=bracket,
         estimated_annual_tax=round(annual_tax, 2),
         suggested_allocation=alloc,
-    )
+)

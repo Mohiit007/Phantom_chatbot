@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+sqlalchemy<2.0
+pydantic
+pydantic-settings
+requests
+spacy
+dateparser
+reportlab
+pytest 
