@@ -1,0 +1,383 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+body {
+  @apply bg-white text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+}
+
+/* Disable transitions/animations when toggling theme to avoid flicker */
+.no-transitions *,
+.no-transitions *::before,
+.no-transitions *::after {
+  transition: none !important;
+}
+
+.card {
+  @apply bg-white shadow-xl rounded-lg p-4 dark:bg-black dark:shadow-black/20 border border-gray-300 dark:border-gray-800;
+  @apply transition-colors motion-safe:transition-transform motion-safe:duration-200 motion-safe:ease-out;
+  position: relative; /* allow pseudo-element highlight for 3D effect */
+}
+.card:hover { 
+  @apply motion-safe:-translate-y-0.5; 
+}
+
+/* Light mode: reduce shadow and add smooth 3D via gentle gradient + inner highlights */
+html:not(.dark) .card {
+  /* Remove shadows in light mode */
+  box-shadow: none;
+  /* White theme: flat white background */
+  background: #ffffff;
+  /* Uniform, thinner border on all sides (light mode only) */
+  border: 0.5px solid #e5e7eb; /* ~gray-200 */
+}
+html:not(.dark) .card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  /* Subtle inner 3D ridge using dark tones (black-tinted) */
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.08), inset 0 -1px 0 rgba(0,0,0,0.12);
+}
+html:not(.dark) .card:hover {
+  /* Keep flat look on hover */
+  box-shadow: none;
+}
+
+.btn {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-red-600 dark:hover:bg-red-700;
+  @apply transition-colors motion-safe:transition-shadow motion-safe:duration-200 motion-safe:ease-out hover:shadow-md dark:hover:shadow-red-900/20;
+}
+.btn-ghost {
+  @apply inline-flex items-center gap-2 px-3 py-2 rounded-md bg-transparent hover:bg-blue-50 dark:hover:bg-red-900/30;
+  @apply transition-colors motion-safe:duration-200;
+}
+.input {
+  @apply border rounded-md px-3 py-2 w-full bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 placeholder-gray-400;
+  @apply transition-colors motion-safe:duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-red-600;
+}
+.label {
+  @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+/* Horror theme accents in dark mode */
+.dark .accent-blood { color: #ef4444; }
+.dark .bg-blood { background-color: #7f1d1d; }
+
+/* Nav link underline animation */
+header nav a { @apply relative motion-safe:transition-transform motion-safe:duration-200; }
+header nav a::after {
+  content: '';
+  @apply absolute left-2 right-2 bottom-1 h-0.5 bg-blue-600 dark:bg-red-600 origin-left;
+  transform: scaleX(0);
+  transition: transform 200ms ease-out;
+}
+header nav a:hover::after,
+header nav a[aria-current='page']::after { transform: scaleX(1); }
+
+/* Table row hover transitions */
+table tbody tr { @apply motion-safe:transition-colors; }
+table tbody tr:hover { @apply bg-blue-50 dark:bg-red-900/20; }
+
+/* Keyframes */
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes fade-out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes slide-up { from { transform: translateY(6px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+
+/* Utility animation classes with motion-safe fallback */
+.fade-in { animation: fade-in 240ms ease-out both; }
+.slide-up { animation: slide-up 260ms ease-out both; }
+@media (prefers-reduced-motion: reduce) { .fade-in, .slide-up { animation: none; } }
+
+/* Toast/notification animations */
+.toast { animation: fade-in 180ms ease-out both, slide-up 220ms ease-out both; }
+.toast-hide { animation: fade-out 150ms ease-in forwards; }
+
+/* Chart.js external tooltip */
+.chartjs-tooltip {
+  position: absolute;
+  pointer-events: none;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.2;
+  background: #ffffff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  transform-origin: top left;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.dark .chartjs-tooltip {
+  background: #0b0b0b;
+  color: #f3f4f6;
+  border-color: #1f2937;
+  box-shadow: 0 6px 16px rgba(220,38,38,0.15);
+}
+
+/* Ghost background layer */
+.ghosts-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: transparent;
+  opacity: 0; /* hidden by default (light mode and before ready) */
+  transition: opacity 900ms ease-out;
+}
+
+/* In dark mode, keep hidden until 'ghosts-ready' is applied to allow fade-in on reload */
+.dark .ghosts-container { opacity: 0; background: #000; }
+.dark .ghosts-container.ghosts-ready { opacity: 1; }
+
+/* Per-ghost fade-in (staggered) */
+.dark .ghosts-container .ghost { transition: opacity 1800ms ease-in-out; }
+.dark .ghosts-container:not(.ghosts-ready) .ghost { opacity: 0 !important; }
+
+/* Stagger delays for each ghost */
+.dark .ghosts-container.ghosts-ready #ghost1  { transition-delay: 0.00s; }
+.dark .ghosts-container.ghosts-ready #ghost2  { transition-delay: 0.15s; }
+.dark .ghosts-container.ghosts-ready #ghost3  { transition-delay: 0.30s; }
+.dark .ghosts-container.ghosts-ready #ghost4  { transition-delay: 0.45s; }
+.dark .ghosts-container.ghosts-ready #ghost5  { transition-delay: 0.60s; }
+.dark .ghosts-container.ghosts-ready #ghost6  { transition-delay: 0.75s; }
+.dark .ghosts-container.ghosts-ready #ghost7  { transition-delay: 0.90s; }
+.dark .ghosts-container.ghosts-ready #ghost8  { transition-delay: 1.05s; }
+.dark .ghosts-container.ghosts-ready #ghost9  { transition-delay: 1.20s; }
+.dark .ghosts-container.ghosts-ready #ghost10 { transition-delay: 1.35s; }
+.dark .ghosts-container.ghosts-ready #ghost11 { transition-delay: 1.50s; }
+.dark .ghosts-container.ghosts-ready #ghost12 { transition-delay: 1.65s; }
+.dark .ghosts-container.ghosts-ready #ghost13 { transition-delay: 1.80s; }
+.dark .ghosts-container.ghosts-ready #ghost14 { transition-delay: 1.95s; }
+.dark .ghosts-container.ghosts-ready #ghost15 { transition-delay: 2.10s; }
+.dark .ghosts-container.ghosts-ready #ghost16 { transition-delay: 2.25s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ghosts-container .ghost { animation: none !important; }
+}
+
+/* Make background black in horror mode while preserving theme utilities */
+.dark body { background-color: #000 !important; }
+.dark header { background-color: #000; }
+
+/* Starfield layers (dots) */
+.stars {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  background-position: 0 0;
+  opacity: 0.7;
+  z-index: -1; /* keep behind ghosts */
+  pointer-events: none;
+}
+.stars-1 { 
+  opacity: 0.45; 
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, rgba(200,220,255,0.98) 60%, transparent 62%),
+    radial-gradient(2px 2px at 120px 80px, rgba(255,255,255,0.98) 60%, transparent 62%),
+    radial-gradient(2px 2px at 220px 140px, rgba(180,210,255,0.98) 60%, transparent 62%),
+    radial-gradient(2px 2px at 340px 220px, rgba(255,255,255,0.98) 60%, transparent 62%),
+    radial-gradient(2px 2px at 60px 200px, rgba(190,215,255,0.98) 60%, transparent 62%),
+    radial-gradient(2px 2px at 300px 260px, rgba(255,255,255,0.98) 60%, transparent 62%),
+    radial-gradient(2px 2px at 180px 20px, rgba(175,205,255,0.98) 60%, transparent 62%);
+  animation: drift1 120s linear infinite, twinkle1 8s ease-in-out infinite; 
+  background-size: 250px 190px; /* even denser */
+}
+.stars-2 { 
+  opacity: 0.35; 
+  background-image: 
+    radial-gradient(1.5px 1.5px at 60px 50px, rgba(180,210,255,0.96) 60%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 200px 120px, rgba(255,255,255,0.96) 60%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 300px 40px, rgba(165,205,255,0.96) 60%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 30px 200px, rgba(255,255,255,0.96) 60%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 260px 260px, rgba(175,205,255,0.96) 60%, transparent 62%),
+    radial-gradient(1.5px 1.5px at 140px 300px, rgba(255,255,255,0.96) 60%, transparent 62%);
+  animation: drift2 160s linear infinite, twinkle2 9s ease-in-out infinite; 
+  background-size: 230px 198px; /* even denser */
+}
+.stars-3 { 
+  opacity: 0.27; 
+  background-image: 
+    radial-gradient(1px 1px at 90px 20px, rgba(170,205,255,0.95) 65%, transparent 67%),
+    radial-gradient(1px 1px at 240px 200px, rgba(255,255,255,0.95) 65%, transparent 67%),
+    radial-gradient(1px 1px at 180px 150px, rgba(165,200,255,0.95) 65%, transparent 67%),
+    radial-gradient(1px 1px at 320px 260px, rgba(255,255,255,0.95) 65%, transparent 67%),
+    radial-gradient(1px 1px at 140px 280px, rgba(160,195,255,0.95) 65%, transparent 67%),
+    radial-gradient(1px 1px at 20px 130px, rgba(255,255,255,0.95) 65%, transparent 67%);
+  animation: drift3 220s linear infinite, twinkle3 10s ease-in-out infinite; 
+  background-size: 230px 230px; /* even denser */
+}
+.stars-4 { 
+  opacity: 0.18; 
+  background-image: 
+    radial-gradient(0.8px 0.8px at 40px 70px, rgba(175,205,255,0.95) 70%, transparent 72%),
+    radial-gradient(0.8px 0.8px at 170px 30px, rgba(255,255,255,0.95) 70%, transparent 72%),
+    radial-gradient(0.8px 0.8px at 280px 110px, rgba(165,200,255,0.95) 70%, transparent 72%),
+    radial-gradient(0.8px 0.8px at 220px 300px, rgba(255,255,255,0.95) 70%, transparent 72%),
+    radial-gradient(0.8px 0.8px at 90px 220px, rgba(160,195,255,0.95) 70%, transparent 72%),
+    radial-gradient(0.8px 0.8px at 330px 180px, rgba(255,255,255,0.95) 70%, transparent 72%),
+    radial-gradient(0.8px 0.8px at 10px 10px, rgba(155,190,255,0.95) 70%, transparent 72%);
+  animation: drift4 260s linear infinite, twinkle4 11s ease-in-out infinite; 
+  background-size: 230px 275px; /* even denser */
+}
+
+@keyframes drift1 { from { transform: translate3d(0,0,0); } to { transform: translate3d(-400px, -300px, 0); } }
+@keyframes drift2 { from { transform: translate3d(0,0,0); } to { transform: translate3d(-360px, -320px, 0); } }
+@keyframes drift3 { from { transform: translate3d(0,0,0); } to { transform: translate3d(-360px, -360px, 0); } }
+@keyframes drift4 { from { transform: translate3d(0,0,0); } to { transform: translate3d(-360px, -420px, 0); } }
+
+/* Subtle twinkle via brightness filter with staggered delays */
+@keyframes twinkle1 { 0%,100% { filter: brightness(1.08); } 50% { filter: brightness(0.97); } }
+@keyframes twinkle2 { 0%,100% { filter: brightness(1.06); } 50% { filter: brightness(0.96); } }
+@keyframes twinkle3 { 0%,100% { filter: brightness(1.05); } 50% { filter: brightness(0.95); } }
+@keyframes twinkle4 { 0%,100% { filter: brightness(1.04); } 50% { filter: brightness(0.94); } }
+
+ /* Performance guard: dim stars and drop a layer when reduced */
+ .ghosts--reduced .stars { opacity: 0.35; }
+ .ghosts--reduced .stars-4 { display: none; }
+ .ghosts--reduced .stars-1 { animation: drift1 120s linear infinite !important; }
+ .ghosts--reduced .stars-2 { animation: drift2 160s linear infinite !important; }
+ .ghosts--reduced .stars-3 { animation: drift3 220s linear infinite !important; }
+
+/* Apply the same reductions on touch/low-precision devices */
+@media (pointer: coarse), (hover: none) {
+  .stars { opacity: 0.5; }
+  .stars-4 { display: none; }
+  .stars-1 { animation: drift1 120s linear infinite !important; }
+  .stars-2 { animation: drift2 160s linear infinite !important; }
+  .stars-3 { animation: drift3 220s linear infinite !important; }
+}
+
+/* Base ghost image style */
+.ghost {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  opacity: 0.4;
+  filter: brightness(1.35) drop-shadow(0 6px 14px rgba(255, 255, 255, 0.15));
+  will-change: transform, top, left, right, bottom;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+/* Size variations per ghost for visual variety */
+#ghost1, #ghost4, #ghost9, #ghost12 { width: 160px; height: 160px; }
+#ghost2, #ghost6, #ghost10, #ghost14 { width: 120px; height: 120px; }
+#ghost3, #ghost7, #ghost11, #ghost15 { width: 90px;  height: 90px;  opacity: 0.36; }
+#ghost5, #ghost8, #ghost13, #ghost16 { width: 200px; height: 200px; opacity: 0.35; }
+
+/* Performance guard: reduced density and brightness */
+.ghosts--reduced .ghost { opacity: 0.28; filter: brightness(1.15) drop-shadow(0 4px 10px rgba(255,255,255,0.12)); }
+.ghosts--reduced #ghost9,
+.ghosts--reduced #ghost10,
+.ghosts--reduced #ghost11,
+.ghosts--reduced #ghost12,
+.ghosts--reduced #ghost13,
+.ghosts--reduced #ghost14,
+.ghosts--reduced #ghost15,
+.ghosts--reduced #ghost16 { display: none; }
+
+/* Ghost 1: Left to right */
+#ghost1 { top: 10%; left: -60px; animation: floatRight 20s linear infinite; }
+/* Ghost 2: Right to left */
+#ghost2 { top: 22%; right: -60px; animation: floatLeft 18s linear infinite; }
+/* Ghost 3: Bottom to top */
+#ghost3 { bottom: -60px; left: 30%; animation: floatUp 22s ease-in-out infinite; }
+/* Ghost 4: Top to bottom */
+#ghost4 { top: -60px; left: 60%; animation: floatDown 19s ease-in-out infinite; }
+/* Ghost 5: Diagonal top-left to bottom-right */
+#ghost5 { top: 0; left: 0; animation: floatDiagonal1 21s linear infinite; }
+/* Ghost 6: Diagonal bottom-right to top-left */
+#ghost6 { bottom: 0; right: 0; animation: floatDiagonal2 23s linear infinite; }
+/* Ghost 7: Zigzag horizontal */
+#ghost7 { top: 50%; left: -60px; animation: zigzagX 24s ease-in-out infinite; }
+/* Ghost 8: Zigzag vertical */
+#ghost8 { left: 80%; top: -60px; animation: zigzagY 26s ease-in-out infinite; }
+
+/* Extra ghosts for more variety */
+#ghost9  { top: 70%; left: -60px; animation: floatRight 20s linear infinite; animation-delay: 3s; }
+#ghost10 { top: 35%; right: -60px; animation: floatLeft 19s linear infinite; animation-delay: 5s; }
+#ghost11 { bottom: -60px; left: 15%; animation: floatUp 24s ease-in-out infinite; animation-delay: 2s; }
+#ghost12 { top: -60px; left: 75%; animation: floatDown 21s ease-in-out infinite; animation-delay: 4s; }
+#ghost13 { top: 10%; left: 10%; animation: floatDiagonal1 22s linear infinite; animation-delay: 1s; }
+#ghost14 { bottom: 5%; right: 5%; animation: floatDiagonal2 25s linear infinite; animation-delay: 6s; }
+#ghost15 { top: 65%; left: -60px; animation: zigzagX 26s ease-in-out infinite; animation-delay: 2.5s; }
+#ghost16 { top: -60px; left: 20%; animation: zigzagY 28s ease-in-out infinite; animation-delay: 3.5s; }
+
+/* Keyframes */
+@keyframes floatRight { to { left: 100vw; } }
+@keyframes floatLeft { to { right: 100vw; } }
+@keyframes floatUp { to { bottom: 100vh; } }
+@keyframes floatDown { to { top: 100vh; } }
+@keyframes floatDiagonal1 { to { top: 100vh; left: 100vw; } }
+@keyframes floatDiagonal2 { to { bottom: 100vh; right: 100vw; } }
+@keyframes zigzagX {
+  0% { left: -60px; top: 50%; }
+  25% { top: 40%; }
+  50% { top: 60%; }
+  75% { top: 45%; }
+  100% { left: 100vw; top: 50%; }
+}
+@keyframes zigzagY {
+  0% { top: -60px; left: 80%; }
+  25% { left: 75%; }
+  50% { left: 85%; }
+  75% { left: 78%; }
+  100% { top: 100vh; left: 80%; }
+}
+
+/* Motion reduction */
+@media (prefers-reduced-motion: reduce) {
+  .ghosts-container .ghost { animation: none !important; }
+}
+
+/* Make background black in horror mode while preserving theme utilities */
+.dark body { background-color: #000 !important; }
+.dark header { background-color: #000; }
+
+/* Brand title styling */
+.brand-title { display: inline-flex; gap: 6px; align-items: baseline; letter-spacing: 0.2px; }
+.brand-phantom, .brand-finance { line-height: 1; }
+
+/* Light theme gradient text */
+html:not(.dark) .brand-phantom {
+  background: linear-gradient(90deg, #0ea5e9 0%, #6366f1 50%, #7c3aed 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+html:not(.dark) .brand-finance {
+  color: #0f172a;
+}
+
+/* Dark theme spooky glow */
+.dark .brand-phantom {
+  background: linear-gradient(90deg, #fca5a5 0%, #ef4444 40%, #7c2d12 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  text-shadow: 0 0 12px rgba(239, 68, 68, 0.25);
+}
+.dark .brand-finance { color: #f3f4f6; text-shadow: 0 0 6px rgba(255,255,255,0.12); }
+
+/* Subtle logo motion */
+.logo-ghost { transform-origin: center; animation: bob 3.2s ease-in-out infinite; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+
+/* Flicker accent on hover in dark mode */
+.dark .brand-title:hover .brand-phantom { animation: flicker 1.4s infinite steps(2, end); }
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { text-shadow: 0 0 14px rgba(239,68,68,0.28), 0 0 24px rgba(127,29,29,0.18); }
+  20%, 24%, 55% { text-shadow: 0 0 6px rgba(239,68,68,0.10); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .logo-ghost, .dark .brand-title:hover .brand-phantom { animation: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars, .stars-1, .stars-2, .stars-3, .stars-4 { animation: none !important; }
+}

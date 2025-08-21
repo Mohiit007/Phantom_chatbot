@@ -19,4 +19,6 @@ __pycache__/
 # OS
 Thumbs.db
 
-
+# Data & DB files
+data/
+*.db

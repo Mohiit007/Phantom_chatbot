@@ -1,4 +1,11 @@
-requests
+dateparser
+fastapi>=0.110.0
 python-dotenv
-pydantic-settings
+pydantic>=2.4.0
+pydantic-settings>=2.2.1
 reportlab
+requests
+sqlalchemy<2.0
+spacy
+uvicorn
+pytest
