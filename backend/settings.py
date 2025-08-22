@@ -18,11 +18,8 @@ class Settings(BaseSettings):
     )
     cache_ttl_market_seconds: int = 900
     
-    # Mock toggle
-    use_mock_market: bool = True
-
-    # Mock toggle
-    use_mock_market: bool = False   
+    # Mock toggle - set to False to enable live market data
+    use_mock_market: bool = False
 
     class Config:
         env_file = ".env"
